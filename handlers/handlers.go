@@ -85,6 +85,11 @@ func (c *Controller) AuthMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
+		if payload.Validate(jwt.ExpirationTimeValidator(time.Now(), false)) != nil {
+			c.handleError(errors.New("token is expired"), w, http.StatusForbidden)
+			return
+		}
+
 		username := payload.Subject
 		ctx := context.WithValue(r.Context(), usernameKey, username)
 
