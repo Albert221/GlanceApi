@@ -21,8 +21,8 @@ type Controller struct {
 	jwtVerifier jwt.Verifier
 }
 
-func NewController(db *sqlx.DB) *Controller {
-	hs256 := jwt.NewHMAC(jwt.SHA256, []byte("some secret"))
+func NewController(db *sqlx.DB, secret string) *Controller {
+	hs256 := jwt.NewHMAC(jwt.SHA256, []byte(secret))
 
 	return &Controller{
 		db:          db,

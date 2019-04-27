@@ -12,6 +12,7 @@ import (
 
 func main() {
 	port := os.Getenv("PORT")
+	secret := os.Getenv("SECRET")
 	dbHost := os.Getenv("DBHOST")
 	dbUser := os.Getenv("DBUSER")
 	dbPassword := os.Getenv("DBPASSWORD")
@@ -32,7 +33,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	contr := NewController(db)
+	contr := NewController(db, secret)
 
 	r := mux.NewRouter()
 	r.HandleFunc("/authenticate", contr.AuthenticateHandler).Methods("POST")
