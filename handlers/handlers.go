@@ -1,9 +1,10 @@
-package main
+package handlers
 
 import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/Albert221/ReddigramApi/reddit"
 	"github.com/gbrlsnchs/jwt/v3"
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
@@ -91,6 +92,18 @@ func (c *Controller) AuthMiddleware(next http.Handler) http.Handler {
 	})
 }
 
+func (c *Controller) createToken(username string) ([]byte, error) {
+	now := time.Now()
+
+	payload := jwt.Payload{
+		Subject:        username,
+		ExpirationTime: now.Add(time.Hour).Unix(),
+		IssuedAt:       now.Unix(),
+	}
+
+	return jwt.Sign(jwt.Header{}, payload, c.jwtSigner)
+}
+
 func (c *Controller) AuthenticateHandler(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
@@ -104,32 +117,33 @@ func (c *Controller) AuthenticateHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	username, err := FetchUsername(accessToken)
+	username, err := reddit.FetchUsername(accessToken)
 	if err != nil {
 		c.handleError(errors.New("wrong access token"), w, http.StatusForbidden)
 		return
 	}
 
-	now := time.Now()
-
-	payload := jwt.Payload{
-		Subject:        username,
-		ExpirationTime: now.Add(time.Hour).Unix(),
-		IssuedAt:       now.Unix(),
-	}
-
-	token, err := jwt.Sign(jwt.Header{}, payload, c.jwtSigner)
+	token, err := c.createToken(username)
 	if err != nil {
 		log.Print(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	response := map[string]interface{}{
-		"token": string(token),
+	c.sendResponse(string(token), w)
+}
+
+func (c *Controller) RefreshTokenHandler(w http.ResponseWriter, r *http.Request) {
+	username := c.getUsername(r)
+
+	token, err := c.createToken(username)
+	if err != nil {
+		log.Print(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
-	c.sendResponse(response, w)
+	c.sendResponse(string(token), w)
 }
 
 type Subscription struct {

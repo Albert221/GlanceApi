@@ -1,4 +1,4 @@
-package main
+package reddit
 
 import (
 	"encoding/json"
