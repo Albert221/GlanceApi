@@ -6,9 +6,13 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
+	"github.com/ulule/limiter/v3"
+	"github.com/ulule/limiter/v3/drivers/middleware/stdlib"
+	"github.com/ulule/limiter/v3/drivers/store/memory"
 	"log"
 	"net/http"
 	"os"
+	"time"
 )
 
 func main() {
@@ -23,6 +27,7 @@ func main() {
 	contr := handlers.NewController(db, secret)
 
 	r := mux.NewRouter()
+	r.Use(createRateLimiterMiddleware())
 	r.HandleFunc("/authenticate", contr.AuthenticateHandler).Methods("POST")
 	r.Handle("/refresh_token", contr.AuthMiddleware(http.HandlerFunc(contr.RefreshTokenHandler))).
 		Methods("POST")
@@ -54,4 +59,17 @@ func createDB() (*sqlx.DB, error) {
 	}
 
 	return sqlx.Open("mysql", dsn.FormatDSN())
+}
+
+func createRateLimiterMiddleware() mux.MiddlewareFunc {
+	store := memory.NewStore()
+	rate := limiter.Rate{
+		Limit:  2,
+		Period: 1 * time.Second,
+	}
+
+	rlim := limiter.New(store, rate)
+	middleware := stdlib.NewMiddleware(rlim)
+
+	return middleware.Handler
 }
