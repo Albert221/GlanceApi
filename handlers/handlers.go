@@ -102,7 +102,7 @@ func (c *Controller) createToken(username string) ([]byte, error) {
 
 	payload := jwt.Payload{
 		Subject:        username,
-		ExpirationTime: now.Add(time.Hour).Unix(),
+		ExpirationTime: now.Add(30 * 24 * time.Hour).Unix(),
 		IssuedAt:       now.Unix(),
 	}
 
