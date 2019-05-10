@@ -1,6 +1,11 @@
 package main
 
 import (
+	"log"
+	"net/http"
+	"os"
+	"time"
+
 	"github.com/Albert221/ReddigramApi/handlers"
 	"github.com/go-sql-driver/mysql"
 	_ "github.com/go-sql-driver/mysql"
@@ -9,10 +14,6 @@ import (
 	"github.com/ulule/limiter/v3"
 	"github.com/ulule/limiter/v3/drivers/middleware/stdlib"
 	"github.com/ulule/limiter/v3/drivers/store/memory"
-	"log"
-	"net/http"
-	"os"
-	"time"
 )
 
 func main() {
@@ -29,8 +30,6 @@ func main() {
 	r := mux.NewRouter()
 	r.Use(createRateLimiterMiddleware())
 	r.HandleFunc("/authenticate", contr.AuthenticateHandler).Methods("POST")
-	r.Handle("/refresh_token", contr.AuthMiddleware(http.HandlerFunc(contr.RefreshTokenHandler))).
-		Methods("POST")
 
 	subs := r.PathPrefix("/subscriptions").Subrouter()
 	subs.Use(contr.AuthMiddleware)
@@ -65,7 +64,7 @@ func createRateLimiterMiddleware() mux.MiddlewareFunc {
 	store := memory.NewStore()
 	rate := limiter.Rate{
 		Limit:  2,
-		Period: 1 * time.Second,
+		Period: 1 * time.Minute,
 	}
 
 	rlim := limiter.New(store, rate)

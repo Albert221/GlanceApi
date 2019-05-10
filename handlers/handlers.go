@@ -4,14 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/Albert221/ReddigramApi/reddit"
-	"github.com/gbrlsnchs/jwt/v3"
-	"github.com/gorilla/mux"
-	"github.com/jmoiron/sqlx"
 	"log"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/Albert221/ReddigramApi/reddit"
+	"github.com/gbrlsnchs/jwt/v3"
+	"github.com/gorilla/mux"
+	"github.com/jmoiron/sqlx"
 )
 
 const usernameKey = "username"
@@ -102,7 +103,7 @@ func (c *Controller) createToken(username string) ([]byte, error) {
 
 	payload := jwt.Payload{
 		Subject:        username,
-		ExpirationTime: now.Add(30 * 24 * time.Hour).Unix(),
+		ExpirationTime: now.Add(1 * time.Hour).Unix(),
 		IssuedAt:       now.Unix(),
 	}
 
@@ -127,19 +128,6 @@ func (c *Controller) AuthenticateHandler(w http.ResponseWriter, r *http.Request)
 		c.handleError(errors.New("wrong access token"), w, http.StatusForbidden)
 		return
 	}
-
-	token, err := c.createToken(username)
-	if err != nil {
-		log.Print(err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	c.sendResponse(string(token), w)
-}
-
-func (c *Controller) RefreshTokenHandler(w http.ResponseWriter, r *http.Request) {
-	username := c.getUsername(r)
 
 	token, err := c.createToken(username)
 	if err != nil {
