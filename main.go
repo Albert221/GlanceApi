@@ -29,6 +29,9 @@ func main() {
 
 	r := mux.NewRouter()
 	r.Use(createRateLimiterMiddleware())
+
+	r.HandleFunc("/suggested-subreddits", contr.SuggestedSubredditsHandler).Methods("POST")
+
 	r.HandleFunc("/authenticate", contr.AuthenticateHandler).Methods("POST")
 
 	subs := r.PathPrefix("/subscriptions").Subrouter()

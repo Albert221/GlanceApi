@@ -53,6 +53,25 @@ func (c *Controller) getUsername(r *http.Request) string {
 	return r.Context().Value(usernameKey).(string)
 }
 
+func (c *Controller) SuggestedSubredditsHandler(w http.ResponseWriter, r *http.Request) {
+	var request []string
+	err := json.NewDecoder(r.Body).Decode(&request)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	// TODO: Implement collaborative recommending system
+	suggestions := []string{
+		"t5_2sh6t", // pics
+		"t5_2sbq3", // EarthPorn
+		"t5_2scjs", // CityPorn
+		"t5_2r1tc", // itookapicture
+	}
+
+	_ = json.NewEncoder(w).Encode(suggestions)
+}
+
 func (c *Controller) AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")

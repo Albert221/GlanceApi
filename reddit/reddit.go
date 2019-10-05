@@ -24,7 +24,7 @@ func FetchUsername(accessToken string) (string, error) {
 	}
 
 	var data map[string]interface{}
-	json.Unmarshal(body, &data)
+	_ = json.Unmarshal(body, &data)
 
 	if username, ok := data["name"].(string); ok {
 		return username, nil
