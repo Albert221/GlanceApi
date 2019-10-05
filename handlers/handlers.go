@@ -69,6 +69,7 @@ func (c *Controller) SuggestedSubredditsHandler(w http.ResponseWriter, r *http.R
 		"t5_2r1tc", // itookapicture
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	_ = json.NewEncoder(w).Encode(suggestions)
 }
 
