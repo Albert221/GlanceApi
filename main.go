@@ -66,7 +66,7 @@ func createDB() (*sqlx.DB, error) {
 func createRateLimiterMiddleware() mux.MiddlewareFunc {
 	store := memory.NewStore()
 	rate := limiter.Rate{
-		Limit:  2,
+		Limit:  10,
 		Period: 1 * time.Minute,
 	}
 
