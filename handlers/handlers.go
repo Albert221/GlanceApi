@@ -211,7 +211,7 @@ func (c *Controller) subExists(username, subreddit string) bool {
 
 func (c *Controller) AddSubHandler(w http.ResponseWriter, r *http.Request) {
 	username := c.getUsername(r)
-	subreddit := mux.Vars(r)["name"]
+	subreddit := mux.Vars(r)["id"]
 
 	if c.subExists(username, subreddit) {
 		c.handleError(errors.New("subreddit already subscribed"), w, http.StatusBadRequest)
@@ -230,7 +230,7 @@ func (c *Controller) AddSubHandler(w http.ResponseWriter, r *http.Request) {
 
 func (c *Controller) RemoveSubHandler(w http.ResponseWriter, r *http.Request) {
 	username := c.getUsername(r)
-	subreddit := mux.Vars(r)["name"]
+	subreddit := mux.Vars(r)["id"]
 
 	if !c.subExists(username, subreddit) {
 		c.handleError(errors.New("subreddit isn't subscribed"), w, http.StatusBadRequest)

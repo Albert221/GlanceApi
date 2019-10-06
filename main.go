@@ -37,8 +37,8 @@ func main() {
 	subs := r.PathPrefix("/subscriptions").Subrouter()
 	subs.Use(contr.AuthMiddleware)
 	subs.HandleFunc("", contr.ListSubsHandler).Methods("GET")
-	subs.HandleFunc("/{name}", contr.AddSubHandler).Methods("PUT")
-	subs.HandleFunc("/{name}", contr.RemoveSubHandler).Methods("DELETE")
+	subs.HandleFunc("/{id}", contr.AddSubHandler).Methods("PUT")
+	subs.HandleFunc("/{id}", contr.RemoveSubHandler).Methods("DELETE")
 
 	log.Fatal(http.ListenAndServe(":"+port, r))
 }
