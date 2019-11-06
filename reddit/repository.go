@@ -7,7 +7,13 @@ import (
 	"net/http"
 )
 
-func FetchUsername(accessToken string) (string, error) {
+type Repository struct{}
+
+func NewRepository() *Repository {
+	return &Repository{}
+}
+
+func (Repository) FetchUsername(accessToken string) (string, error) {
 	req, _ := http.NewRequest("GET", "https://oauth.reddit.com/api/v1/me", nil)
 	req.Header.Add("Authorization", "Bearer "+accessToken)
 	req.Header.Add("User-Agent", "Reddigram API Server (by /u/Albert221)")
