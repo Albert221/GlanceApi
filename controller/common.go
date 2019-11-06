@@ -8,7 +8,12 @@ import (
 type usernameContextKey struct{}
 
 func getUsername(r *http.Request) string {
-	return r.Context().Value(usernameContextKey{}).(string)
+	username := r.Context().Value(usernameContextKey{})
+	if username == nil {
+		return ""
+	}
+
+	return username.(string)
 }
 
 func writeJSON(w http.ResponseWriter, body interface{}, statusCode int) {

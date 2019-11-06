@@ -36,13 +36,13 @@ func (a *AuthController) AuthenticateHandler(w http.ResponseWriter, r *http.Requ
 
 	accessToken := r.PostFormValue("access_token")
 	if accessToken == "" {
-		writeJSON(w, map[string]string{"error": "access_token is required"}, http.StatusForbidden)
+		writeJSON(w, map[string]string{"error": "access_token is required"}, http.StatusBadRequest)
 		return
 	}
 
 	username, err := a.redditRepo.FetchUsername(accessToken)
 	if err != nil {
-		writeJSON(w, map[string]string{"error": "wrong access token"}, http.StatusForbidden)
+		writeJSON(w, map[string]string{"error": "wrong access token"}, http.StatusBadRequest)
 		return
 	}
 
